@@ -88,6 +88,8 @@ ADD ./logstash-init /etc/init.d/logstash
 RUN sed -i -e 's#^LS_HOME=$#LS_HOME='$LOGSTASH_HOME'#' /etc/init.d/logstash \
  && chmod +x /etc/init.d/logstash
 
+ADD ./logstash-input-udp /opt/logstash-input-udp
+RUN ${LOGSTASH_HOME}/bin/logstash-plugin install /opt/logstash-input-udp/logstash-input-udp.gemspec
 
 ### install Kibana
 
@@ -127,19 +129,19 @@ RUN cp ${ES_HOME}/config/log4j2.properties ${ES_HOME}/config/jvm.options \
 ### configure Logstash
 
 # certs/keys for Beats and Lumberjack input
-RUN mkdir -p /etc/pki/tls/certs && mkdir /etc/pki/tls/private
-ADD ./logstash-beats.crt /etc/pki/tls/certs/logstash-beats.crt
-ADD ./logstash-beats.key /etc/pki/tls/private/logstash-beats.key
+#RUN mkdir -p /etc/pki/tls/certs && mkdir /etc/pki/tls/private
+#ADD ./logstash-beats.crt /etc/pki/tls/certs/logstash-beats.crt
+#ADD ./logstash-beats.key /etc/pki/tls/private/logstash-beats.key
 
 # filters
 ADD ./02-beats-input.conf ${LOGSTASH_PATH_CONF}/conf.d/02-beats-input.conf
-ADD ./10-syslog.conf ${LOGSTASH_PATH_CONF}/conf.d/10-syslog.conf
-ADD ./11-nginx.conf ${LOGSTASH_PATH_CONF}/conf.d/11-nginx.conf
+#ADD ./10-syslog.conf ${LOGSTASH_PATH_CONF}/conf.d/10-syslog.conf
+#ADD ./11-nginx.conf ${LOGSTASH_PATH_CONF}/conf.d/11-nginx.conf
 ADD ./30-output.conf ${LOGSTASH_PATH_CONF}/conf.d/30-output.conf
 
 # patterns
-ADD ./nginx.pattern ${LOGSTASH_HOME}/patterns/nginx
-RUN chown -R logstash:logstash ${LOGSTASH_HOME}/patterns
+#ADD ./nginx.pattern ${LOGSTASH_HOME}/patterns/nginx
+#RUN chown -R logstash:logstash ${LOGSTASH_HOME}/patterns
 
 # Fix permissions
 RUN chmod -R +r ${LOGSTASH_PATH_CONF}
@@ -166,7 +168,7 @@ ADD ./kibana.yml ${KIBANA_HOME}/config/kibana.yml
 ADD ./start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
-EXPOSE 5601 9200 9300 5044
+EXPOSE 5601 9200 9300 5044/udp
 VOLUME /var/lib/elasticsearch
 
 CMD [ "/usr/local/bin/start.sh" ]
