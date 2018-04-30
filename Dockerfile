@@ -88,8 +88,8 @@ ADD ./logstash-init /etc/init.d/logstash
 RUN sed -i -e 's#^LS_HOME=$#LS_HOME='$LOGSTASH_HOME'#' /etc/init.d/logstash \
  && chmod +x /etc/init.d/logstash
 
-ADD ./logstash-input-udp /opt/logstash-input-udp
-RUN ${LOGSTASH_HOME}/bin/logstash-plugin install /opt/logstash-input-udp/logstash-input-udp.gemspec
+ADD ./logstash-input-udp2 /opt/logstash/logstash-input-udp2
+RUN ${LOGSTASH_HOME}/bin/logstash-plugin install /opt/logstash/logstash-input-udp2/logstash-input-udp2-3.3.2.gem
 
 ### install Kibana
 
